@@ -32,12 +32,14 @@ public class Problem054 {
 
 		Timer timer = new Timer();
 
-		String file = "C:\\Users\\karl.walker\\JavaEclipseWorkspace\\123\\p054_poker.txt";
+		String file = "H:\\git\\test\\MyEuler\\p054_poker.txt";
 
+		//Load file content and split into rounds
 		String fromFile = myFileRead.readFileContent(file);
 		List<String> hands = Arrays.asList(fromFile.split(","));
+		
+		//Split rounds into hands and check winner
 		int aWinCount = 0;
-
 		for (int i = 0; i < hands.size(); i++) {
 			String handA = hands.get(i).substring(0, 14);
 			String handB = hands.get(i).substring(15);
@@ -65,6 +67,7 @@ public class Problem054 {
 		if (HANDSCORE(handTWO) < HANDSCORE(handONE)) {
 			return true;
 		}
+		//Determines the winner if hands are of same type
 		if (HANDSCORE(handTWO) == HANDSCORE(handONE)) {
 			StringBuilder SBA = new StringBuilder("");
 			for (Integer integer : sortedHandONE) {
@@ -87,7 +90,7 @@ public class Problem054 {
 				return true;
 			}
 			if (Integer.valueOf(SBB.toString()) == Integer.valueOf(SBA.toString())) {
-				System.out.println("Tie");
+				System.out.println("Chop Pot");
 			}
 
 		}
@@ -96,7 +99,7 @@ public class Problem054 {
 	}
 
 	private static int HANDSCORE(List<String> hand) {
-
+		//Runs various scoring functions below
 		if (FLUSHCHECK(hand)) {
 			if (STRAIGHTCHECK(hand)) {
 				return 8;
@@ -113,6 +116,7 @@ public class Problem054 {
 	}
 
 	private static boolean FLUSHCHECK(List<String> hand) {
+		//Check for 5 of the same suit
 		List<String> suits = new ArrayList<String>();
 		for (String card : hand) {
 			suits.add(card.substring(1, 2));
@@ -125,6 +129,7 @@ public class Problem054 {
 	}
 
 	private static boolean STRAIGHTCHECK(List<String> hand) {
+		//checks for 5 cards in a row, including 1-5 converting of A to a 1 instead of 13
 		List<Integer> cards = SORTHAND(hand);
 		int lowest = cards.get(4);
 		if (lowest == cards.get(3) - 1 && lowest == cards.get(2) - 2 && lowest == cards.get(1) - 3) {
@@ -140,6 +145,8 @@ public class Problem054 {
 	}
 
 	private static int DUPLICATECOUNT(List<String> hand) {
+		//Create a set, then determine number of duplicates by size of that set
+		//Return value corresponds to hand type at top of page
 		List<Integer> sorted = SORTHAND(hand);
 		Set<Integer> Numbers = new HashSet<Integer>();
 		for (Integer integer : sorted) {
@@ -163,7 +170,9 @@ public class Problem054 {
 		return 0;
 	}
 
-	private static List<Integer> SORTHAND(List<String> hand) {
+	
+	private static List<Integer> SORTHAND(List<String> hand) {		
+		//Convert face cards to numbers
 		List<Integer> cards = new ArrayList<Integer>();
 		for (String s : hand) {
 			if (s.charAt(0) == 'A') {
@@ -180,9 +189,11 @@ public class Problem054 {
 				cards.add(Integer.valueOf(s.substring(0, 1)));
 			}
 		}
+		//Sort largest to smallest
 		cards.sort(null);
 		Collections.reverse(cards);
 
+		//Duplicate number check
 		Map<Integer, Integer> sorted = new HashMap<Integer, Integer>();
 		for (Integer integer : cards) {
 			if (!sorted.containsKey(integer)) {
@@ -192,6 +203,7 @@ public class Problem054 {
 			}
 		}
 
+		//Adds duplicates to List first
 		Map<Integer, Integer> sortedByCount = sorted.entrySet().stream().sorted((Map.Entry.comparingByValue()))
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
 
@@ -205,17 +217,20 @@ public class Problem054 {
 			}
 		}
 
-		List<Integer> temp2 = new ArrayList<Integer>();
+		//Collect remaining singles
+		List<Integer> singles = new ArrayList<Integer>();
 		for (Integer integer : sortedByCount.keySet()) {
 			if (sortedByCount.get(integer) == 1) {
-				temp2.add(integer);
+				singles.add(integer);
 			}
 		}
-		Collections.reverse(temp2);
-		for (int i = 0; i < temp2.size(); i++) {
-			output.add(temp2.get(i));
+		Collections.reverse(singles);
+		//Add singles to end of list
+		for (int i = 0; i < singles.size(); i++) {
+			output.add(singles.get(i));
 		}
 
+		//return sorted hand
 		return output;
 	}
 
